@@ -10,7 +10,12 @@ import {
 
 import { useLocation, useNavigate } from 'react-router-dom';
 
-export default function SetTodo() {
+/**
+ * Компонент для создания или изменения таска
+ *
+ * @component
+ */
+function SetTodo() {
     const navigate = useNavigate();
     const [title, setTitle] = useState('')
     const [text, setText] = useState('')
@@ -30,14 +35,25 @@ export default function SetTodo() {
         }
     }, [task])
 
+    /**
+ * Загружает файлы с базы данных
+ *
+ * @async
+ * @function uploadFile
+ */
     const uploadFile = async () => {
-        const imagesRef = ref(storage, `files/${file?.name}`);
-        await uploadBytes(imagesRef, file).then((snapshot) => {
+        const filesRef = ref(storage, `files/${file?.name}`);
+        await uploadBytes(filesRef, file).then((snapshot) => {
             console.log('Uploaded a file!');
         });
     }
-
-    const createTodo = async (evt) => {
+    /**
+ * Создает или обновляет todo в базе данных
+ *
+ * @async
+ * @function setTodo
+ */
+    const setTodo = async (evt) => {
         evt.preventDefault();
         // если редактирование
         if (task) {
@@ -58,6 +74,17 @@ export default function SetTodo() {
         navigate('/')
     };
 
+    /**
+ * newTask создание нового таска
+ * @typedef newTask
+ * @property {boolean} checked выполнен таск или нет
+ * @property {string} title название
+ * @property {string} text описание
+ * @property {string} dueTime дата до которой нужно выполнить таск
+ * @property {string} fileName имя файла
+ * @property {string} fileType расширение файла
+
+ */
     const newTask = {
         checked: false,
         title: title,
@@ -70,7 +97,7 @@ export default function SetTodo() {
     return (
         <>
             <h2 className='todo__subtitle'>Set Todo</h2>
-            <form className="todo__form" onSubmit={createTodo}>
+            <form className="todo__form" onSubmit={setTodo}>
                 <label className='todo__label'>
                     <span className='todo__label-text'>Title</span>
                     <input
@@ -119,3 +146,4 @@ export default function SetTodo() {
         </>
     )
 }
+export default SetTodo;

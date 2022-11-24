@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: SetTodo.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: SetTodo.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect, useState } from 'react';
+import { db, storage } from '../firebase-config';
+import { ref, uploadBytes } from "firebase/storage";
+import {
+    collection,
+    addDoc,
+    updateDoc,
+    doc,
+} from "firebase/firestore";
+
+import { useLocation, useNavigate } from 'react-router-dom';
+
+export default function SetTodo() {
+    const navigate = useNavigate();
+    const [title, setTitle] = useState('')
+    const [text, setText] = useState('')
+    const [dueTime, setDueTime] = useState('');
+    const [file, setFile] = useState(null);
+    const tasksCollectionRef = collection(db, "tasks");
+    const [alert, setAlert] = useState(false)
+
+    const location = useLocation();
+    const task = location.state;
+
+    useEffect(() => {
+        if (task) {
+            setTitle(task.title);
+            setText(task.text)
+            setDueTime(task.dueTime)
+        }
+    }, [task])
+
+    /**
+ * Загружает файлы с базы данных
+ *
+ * @async
+ * @function uploadFile
+ */
+    const uploadFile = async () => {
+        const filesRef = ref(storage, `files/${file?.name}`);
+        await uploadBytes(filesRef, file).then((snapshot) => {
+            console.log('Uploaded a file!');
+        });
+    }
+
+    const createTodo = async (evt) => {
+        evt.preventDefault();
+        // если редактирование
+        if (task) {
+            const taskDoc = doc(db, "tasks", task.id);
+            const newFields = { ...newTask };
+            await updateDoc(taskDoc, newFields);
+            // если создание
+        } else {
+            if (!title) {
+                setAlert(true)
+                return;
+            }
+            setAlert(false)
+            await addDoc(tasksCollectionRef, newTask);
+            if (file) { uploadFile() }
+        }
+
+        navigate('/')
+    };
+
+    const newTask = {
+        checked: false,
+        title: title,
+        text: text,
+        dueTime: dueTime,
+        fileName: file ? file.name : '',
+        fileType: file ? file.type : ''
+    }
+
+    return (
+        &lt;>
+            &lt;h2 className='todo__subtitle'>Set Todo&lt;/h2>
+            &lt;form className="todo__form" onSubmit={createTodo}>
+                &lt;label className='todo__label'>
+                    &lt;span className='todo__label-text'>Title&lt;/span>
+                    &lt;input
+                        className='todo__input'
+                        type="text"
+                        onChange={(event) => {
+                            setTitle(event.target.value);
+                        }}
+                        value={title}
+                    />
+                &lt;/label>
+                &lt;label className='todo__label'>
+                    &lt;span className='todo__label-text'>Text&lt;/span>
+                    &lt;input
+                        className='todo__input'
+                        type="text"
+                        onChange={(event) => {
+                            setText(event.target.value);
+                        }}
+                        value={text}
+                    />
+                &lt;/label>
+                &lt;label className='todo__label'>
+                    &lt;span className='todo__label-text'>Due time&lt;/span>
+                    &lt;input
+                        className='todo__input'
+                        type="date"
+                        onChange={(event) => {
+                            setDueTime(event.target.value);
+                        }}
+                        value={dueTime}
+                    />
+                &lt;/label>
+                &lt;label className='todo__label'>
+                    &lt;span className='todo__label-text'>Attach files&lt;/span>
+                    &lt;input
+                        className='todo__file-input'
+                        type="file"
+                        onChange={(event) => {
+                            setFile(event.target.files[0]);
+                        }} />
+                &lt;/label>
+                {alert ? &lt;p className='todo__alert'>You need a title for this task!&lt;/p> : ''}
+                &lt;input className='button' type="submit" />
+            &lt;/form>
+        &lt;/>
+    )
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#myFunction%25D0%25A4%25D1%2583%25D0%25BD%25D0%25BA%25D1%2586%25D0%25B8%25D1%258F-%25D0%25BE%25D0%25B1%25D1%2580%25D0%25B0%25D0%25B1%25D0%25BE%25D1%2582%25D1%2587%25D0%25B8%25D0%25BA%25D0%25BA%25D0%25BB%25D0%25B8%25D0%25BA%25D0%25B0%25D0%25BF%25D0%25BE%25D0%25BA%25D0%25BD%25D0%25BE%25D0%25BF%25D0%25BA%25D0%25B5%25D0%25B4%25D0%25BE%25D0%25B1%25D0%25B0%25D0%25B2%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25B8%25D1%258F%25D0%25BD%25D0%25BE%25D0%25B2%25D0%25BE%25D0%25B3%25D0%25BE%25D1%2582%25D0%25B0%25D1%2581%25D0%25BA%25D0%25B0,%25D0%25BF%25D0%25B5%25D1%2580%25D0%25B5%25D0%25BD%25D0%25BE%25D1%2581%25D0%25B8%25D1%2582%25D0%25BD%25D0%25B0%25D1%2581%25D1%2582%25D1%2580%25D0%25B0%25D0%25BD%25D0%25B8%25D1%2586%25D1%2583%25D1%2581%25D0%25BE%25D0%25B7%25D0%25B4%25D0%25B0%25D0%25BD%25D0%25B8%25D1%258F%25D1%2582%25D0%25B0%25D1%2581%25D0%25BA%25D0%25B0">myFunction 
+Функция-обработчик клика по кнопке добавления нового таска, переносит на страницу создания таска</a></li><li><a href="global.html#uploadFile">uploadFile</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Thu Nov 24 2022 13:32:51 GMT+0400 (Армения, стандартное время)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

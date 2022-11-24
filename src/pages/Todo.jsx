@@ -5,13 +5,14 @@ import File from '../components/File';
 import { db } from '../firebase-config';
 import checkDate from '../helpers/checkDate';
 
-export default function Todo() {
 
+export default function Todo() {
     const location = useLocation();
     const [tooLate, setTooLate] = useState(false);
     const task = location.state;
     const [checked, setChecked] = useState(task.checked)
     const taskDoc = doc(db, "tasks", task.id);
+
     useEffect(() => {
         setTooLate(checkDate(task.dueTime))
     }, [])

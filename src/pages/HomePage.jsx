@@ -4,7 +4,9 @@ import TodoList from '../components/TodoList'
 
 export default function HomePage() {
     const navigate = useNavigate();
-    const addNewTaskHandler = () => {
+    /** @function myFunction 
+     * Функция-обработчик клика по кнопке добавления нового таска, переносит на страницу создания таска**/
+    function addNewTaskHandler() {
         navigate("/todo/setTodo")
     }
     return (

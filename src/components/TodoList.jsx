@@ -3,12 +3,23 @@ import React, { useEffect, useState } from 'react'
 import { db } from '../firebase-config';
 import TodoItem from './TodoItem'
 
-
-export default function TodoList() {
+/**
+ * Компонент для вывода списка тасков
+ *
+ * @component
+ */
+function TodoList() {
     const tasksCollectionRef = collection(db, "tasks");
     const [tasks, setTasks] = useState([])
     const [ifReload, setIfReload] = useState(false)
     useEffect(() => {
+        /**
+* Создает или обновляет todo в базе данных
+*
+* @async
+* @function getTasks
+* информация об уже добавленных тасках подгружается из базы данных
+*/
         const getTasks = async () => {
             const data = await getDocs(tasksCollectionRef);
             setTasks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
@@ -23,3 +34,4 @@ export default function TodoList() {
         </div>
     )
 }
+export default TodoList;

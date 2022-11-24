@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/TodoItem.jsx</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/TodoItem.jsx</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+    updateDoc,
+    deleteDoc,
+    doc,
+} from "firebase/firestore";
+import { db } from '../firebase-config';
+import { ref, getDownloadURL, deleteObject } from "firebase/storage";
+import { storage } from '../firebase-config';
+import File from './File';
+import checkDate from '../helpers/checkDate';
+
+/**
+ * Компонент для вывода информации о таске в списке
+ *
+ * @component
+ * @example
+ * 
+ * return (
+ *   &lt;TodoItem task={item} setIfReload={setIfReload} />
+ * )
+ */
+function TodoItem({ task, setIfReload }) {
+    const taskDoc = doc(db, "tasks", task.id);
+    const [checked, setChecked] = useState(task.checked);
+    const [tooLate, setTooLate] = useState(false)
+    const [fileSrc, setFileSrc] = useState('')
+    const navigate = useNavigate();
+    let filesRef;
+
+    if (task.fileName) {
+        filesRef = ref(storage, `files/${task.fileName}`);
+    }
+
+    useEffect(() => {
+        setTooLate(checkDate(task.dueTime));
+        setIfReload(false)
+        if (task.fileName) {
+            getDownloadURL(filesRef)
+                .then((url) => {
+                    setFileSrc(url);
+                })
+                .catch(() => {
+                    console.error('error with file uploading');
+                    // setIfReload(true)
+                })
+        }
+    }, [task])
+
+    /**
+* Переходит на страницу просмотра таска
+*
+* @function todoItemClickHandler
+*/
+
+    const todoItemClickHandler = () => {
+        navigate("/todo/todo", {
+            state: {
+                ...task,
+                fileSrc: fileSrc
+            },
+        })
+    }
+    /**
+   * Переходит на страницу редактирования таска
+   *
+   * @function editClickHandler
+   */
+    const editClickHandler = (evt) => {
+        evt.stopPropagation();
+        navigate("/todo/setTodo", { state: task });
+    }
+    /**
+   * Удаляет таск и файлы из базы данных
+   *
+   * @async
+   * @function deleteClickHandler
+   */
+    const deleteClickHandler = async (evt) => {
+        evt.stopPropagation();
+        await deleteDoc(taskDoc);
+        if (task.fileName) {
+            deleteObject(filesRef).then(() => {
+                console.log('file deleted');
+            }).catch((error) => {
+                console.error('error with file deletion')
+            })
+        }
+        setIfReload(true)
+    }
+
+    /**
+* меняет состояние таска с активного на неактивный и наоборот
+*
+* @async
+* @function checkboxChangeHandler
+*/
+    const checkboxChangeHandler = async (evt) => {
+        evt.stopPropagation();
+        setChecked(!checked);
+        await updateDoc(taskDoc, { checked: !checked });
+    }
+
+    return (
+        &lt;div className={checked ? "todo__item todo__item--checked" : "todo__item"} onClick={todoItemClickHandler}>
+            &lt;label className='checkbox' onClick={(evt) => { evt.stopPropagation() }}>
+                &lt;input className='checkbox__input' type="checkbox" checked={checked} onChange={checkboxChangeHandler} />
+                &lt;span className='checkbox__indicator'>&lt;/span>
+            &lt;/label>
+            &lt;h2 className='todo__title'>{task.title}&lt;/h2>
+            &lt;p className='todo__text'>{task.text}&lt;/p>
+            &lt;div className="todo__bottom">
+                &lt;div className="todo__left">
+                    {task.dueTime ? &lt;p className={tooLate ? "todo__date todo__date--late" : "todo__date"}>{task.dueTime}&lt;/p> : ""}
+                    &lt;>{task.fileName ? &lt;File fileSrc={fileSrc} fileType={task.fileType.slice(0, 5)} width={50} /> : ""}
+                    &lt;/>
+                &lt;/div>
+                &lt;div className="todo__right todo__buttons">
+                    &lt;button className="button" onClick={deleteClickHandler}>delete&lt;/button>
+                    &lt;button className="button" onClick={editClickHandler}>edit&lt;/button>
+                &lt;/div>
+            &lt;/div>
+
+
+        &lt;/div>
+    )
+}
+export default TodoItem;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="File.html">File</a></li><li><a href="Navigation.html">Navigation</a></li><li><a href="SetTodo.html">SetTodo</a></li><li><a href="TodoItem.html">TodoItem</a></li><li><a href="TodoList.html">TodoList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#checkboxChangeHandler">checkboxChangeHandler</a></li><li><a href="global.html#deleteClickHandler">deleteClickHandler</a></li><li><a href="global.html#editClickHandler">editClickHandler</a></li><li><a href="global.html#getTasks%25D0%25B8%25D0%25BD%25D1%2584%25D0%25BE%25D1%2580%25D0%25BC%25D0%25B0%25D1%2586%25D0%25B8%25D1%258F%25D0%25BE%25D0%25B1%25D1%2583%25D0%25B6%25D0%25B5%25D0%25B4%25D0%25BE%25D0%25B1%25D0%25B0%25D0%25B2%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25BD%25D1%258B%25D1%2585%25D1%2582%25D0%25B0%25D1%2581%25D0%25BA%25D0%25B0%25D1%2585%25D0%25BF%25D0%25BE%25D0%25B4%25D0%25B3%25D1%2580%25D1%2583%25D0%25B6%25D0%25B0%25D0%25B5%25D1%2582%25D1%2581%25D1%258F%25D0%25B8%25D0%25B7%25D0%25B1%25D0%25B0%25D0%25B7%25D1%258B%25D0%25B4%25D0%25B0%25D0%25BD%25D0%25BD%25D1%258B%25D1%2585">getTasks
+информация об уже добавленных тасках подгружается из базы данных</a></li><li><a href="global.html#myFunction%25D0%25A4%25D1%2583%25D0%25BD%25D0%25BA%25D1%2586%25D0%25B8%25D1%258F-%25D0%25BE%25D0%25B1%25D1%2580%25D0%25B0%25D0%25B1%25D0%25BE%25D1%2582%25D1%2587%25D0%25B8%25D0%25BA%25D0%25BA%25D0%25BB%25D0%25B8%25D0%25BA%25D0%25B0%25D0%25BF%25D0%25BE%25D0%25BA%25D0%25BD%25D0%25BE%25D0%25BF%25D0%25BA%25D0%25B5%25D0%25B4%25D0%25BE%25D0%25B1%25D0%25B0%25D0%25B2%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25B8%25D1%258F%25D0%25BD%25D0%25BE%25D0%25B2%25D0%25BE%25D0%25B3%25D0%25BE%25D1%2582%25D0%25B0%25D1%2581%25D0%25BA%25D0%25B0,%25D0%25BF%25D0%25B5%25D1%2580%25D0%25B5%25D0%25BD%25D0%25BE%25D1%2581%25D0%25B8%25D1%2582%25D0%25BD%25D0%25B0%25D1%2581%25D1%2582%25D1%2580%25D0%25B0%25D0%25BD%25D0%25B8%25D1%2586%25D1%2583%25D1%2581%25D0%25BE%25D0%25B7%25D0%25B4%25D0%25B0%25D0%25BD%25D0%25B8%25D1%258F%25D1%2582%25D0%25B0%25D1%2581%25D0%25BA%25D0%25B0">myFunction 
+Функция-обработчик клика по кнопке добавления нового таска, переносит на страницу создания таска</a></li><li><a href="global.html#setTodo">setTodo</a></li><li><a href="global.html#todoItemClickHandler">todoItemClickHandler</a></li><li><a href="global.html#uploadFile">uploadFile</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Thu Nov 24 2022 15:11:17 GMT+0400 (Армения, стандартное время)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

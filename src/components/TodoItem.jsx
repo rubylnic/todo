@@ -11,8 +11,17 @@ import { storage } from '../firebase-config';
 import File from './File';
 import checkDate from '../helpers/checkDate';
 
-
-export default function TodoItem({ task, setIfReload }) {
+/**
+ * Компонент для вывода информации о таске в списке
+ *
+ * @component
+ * @example
+ * 
+ * return (
+ *   <TodoItem task={item} setIfReload={setIfReload} />
+ * )
+ */
+function TodoItem({ task, setIfReload }) {
     const taskDoc = doc(db, "tasks", task.id);
     const [checked, setChecked] = useState(task.checked);
     const [tooLate, setTooLate] = useState(false)
@@ -34,10 +43,16 @@ export default function TodoItem({ task, setIfReload }) {
                 })
                 .catch(() => {
                     console.error('error with file uploading');
-                    window.location.reload()
+                    // setIfReload(true)
                 })
         }
     }, [task])
+
+    /**
+* Переходит на страницу просмотра таска
+*
+* @function todoItemClickHandler
+*/
 
     const todoItemClickHandler = () => {
         navigate("/todo/todo", {
@@ -47,12 +62,21 @@ export default function TodoItem({ task, setIfReload }) {
             },
         })
     }
-
+    /**
+   * Переходит на страницу редактирования таска
+   *
+   * @function editClickHandler
+   */
     const editClickHandler = (evt) => {
         evt.stopPropagation();
         navigate("/todo/setTodo", { state: task });
     }
-
+    /**
+   * Удаляет таск и файлы из базы данных
+   *
+   * @async
+   * @function deleteClickHandler
+   */
     const deleteClickHandler = async (evt) => {
         evt.stopPropagation();
         await deleteDoc(taskDoc);
@@ -66,6 +90,12 @@ export default function TodoItem({ task, setIfReload }) {
         setIfReload(true)
     }
 
+    /**
+* меняет состояние таска с активного на неактивный и наоборот
+*
+* @async
+* @function checkboxChangeHandler
+*/
     const checkboxChangeHandler = async (evt) => {
         evt.stopPropagation();
         setChecked(!checked);
@@ -96,3 +126,4 @@ export default function TodoItem({ task, setIfReload }) {
         </div>
     )
 }
+export default TodoItem;
