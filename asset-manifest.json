@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/todo/static/css/main.ea7090cf.css",
+    "main.js": "/todo/static/js/main.8c7db662.js",
+    "index.html": "/todo/index.html",
+    "static/media/tick.svg": "/todo/static/media/tick.1a5cb163c436f6b83647.svg",
+    "main.ea7090cf.css.map": "/todo/static/css/main.ea7090cf.css.map",
+    "main.8c7db662.js.map": "/todo/static/js/main.8c7db662.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ea7090cf.css",
+    "static/js/main.8c7db662.js"
+  ]
+}
