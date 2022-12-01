@@ -7,6 +7,5 @@ You can: add new tasks, set due time and attach files to them. Also you can edit
 +	[Firebase](https://firebase.google.com/)
 +	[React](https://reactjs.org/)
  + CSS: [SCSS](https://sass-lang.com/) 
- + App state management:  [Redux](https://redux.js.org/) 
 
 
